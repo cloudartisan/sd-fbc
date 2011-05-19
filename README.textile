@@ -1,0 +1,51 @@
+h1. FreeBuffersCache plugin for Server Density
+
+h2. Yo! Where My RAM At?
+
+This Server Density plugin (aka "quick hack") checks the true amount of "free" memory.  See http://www.linuxatemyram.com/ for details.
+
+h2. Dude, Seriously, Where Is My RAM???
+
+Servers with massive amounts of disk access (typically search/index/database servers) will often build a large disk cache.  Unfortunately, many tools check the "free" memory only and assume the server is running out of memory, when it is still available but currently held by buffers and cache.
+
+Eg, in this example there's really 2.5GB available to applications.
+
+<pre>
+							 total       used       free     shared    buffers     cached
+	Mem:          7468       7413         54          0        421     2114
+	-/+ buffers/cache:       4878       2590
+	Swap:            0          0          0
+</pre>
+
+The above example is from a server running Elastic Search with a huge number of open files.  Check out this output from @slabtop@, sorted by cache size:
+
+<pre>
+		OBJS ACTIVE  USE OBJ SIZE  SLABS OBJ/SLAB CACHE SIZE NAME
+	642369 621647  96%    0.10K  16471       39     65884K buffer_head
+	181776 181706  99%    0.19K   8656       21     34624K dentry
+	 21840  21840 100%    0.96K   1365       16     21840K ext4_inode_cache
+	 19138  18429  96%    0.55K   1367       14     10936K radix_tree_node
+		5057   4901  96%    0.58K    389       13      3112K inode_cache
+		2240   1954  87%    0.79K    112       20      1792K ext3_inode_cache
+</pre>
+
+h2. Manual Installation
+
+* Configure your agent so that it knows about plugins
+* http://www.serverdensity.com/docs/agent/plugins/ 
+* Install the plugin in your sd-agent plugins directory
+* Move FreeBuffersCache.py into that directory 
+* Restart the agent (service sd-agent restart)
+* Head to https://youraccount.serverdensity.com/plugins/ and Add new plugin
+* Add a plugin called FreeBuffersCache
+* Edit the FreeBuffersCache plugin and create groups for the graphs (see the
+* configuration section below)
+
+h2. Configuring Server Density Plugin Group
+
+In Server Density, create the following group for the plugin:
+
+<pre>
+Title: FreeBuffersCache
+Key: free_buffers_cache
+</pre>
